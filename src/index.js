@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
+require("dotenv").config();
 const { IntentsBitField } = Discord;
 
-const token = process.env.DISCORD_TOKEN | ""
 const client = new Discord.Client({
     intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent, IntentsBitField.Flags.GuildPresences],
 })
@@ -45,7 +45,7 @@ client.on('channelUpdate', (oldChannel, newChannel) => {
 
 //todo test
 // Emitted for general debugging information.
-client.on('debug', (debug) => {
+client.on('debug', (info) => {
     console.log(`debug: ${info}`);
 });
 
@@ -427,4 +427,4 @@ client.on('webhookUpdate', (channel) => {
     console.log(`webhookUpdate: ${channel}`);
 });
 
-client.login(token);
+client.login(process.env.DISCORD_TOKEN);
