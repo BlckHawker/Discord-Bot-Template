@@ -1,10 +1,23 @@
 require("dotenv").config();
 const Discord = require('discord.js');
 const utils = require("./utils.js");
-const { IntentsBitField } = Discord;
+const { GatewayIntentBits, IntentsBitField, Partials } = Discord;
 
 const client = new Discord.Client({
-    intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent, IntentsBitField.Flags.GuildPresences],
+    intents: [
+        GatewayIntentBits.DirectMessages, 
+        GatewayIntentBits.MessageContent,
+        IntentsBitField.Flags.GuildMembers, 
+        IntentsBitField.Flags.GuildMessages, 
+        IntentsBitField.Flags.GuildPresences, 
+        IntentsBitField.Flags.Guilds, 
+        IntentsBitField.Flags.MessageContent
+    ],
+
+    partials: [
+        Partials.Channel,
+        Partials.Message
+    ]
 })
 
 // most of the events were found here 
@@ -218,14 +231,25 @@ client.on('inviteDelete', (invite) => {
 client.on('messageCreate', (message) => {
     if(message.author.id == process.env.CLIENT_ID)
         return;
-    const content = `${message.author.username} sent a message in <#${message.channelId}> saying "${message.content}"`;
-    utils.sendMessage(client, content);
+
+    let content;
+    if(!message.guild)
+    {
+        content = `${message.author.username} sent a message in dms saying "${message.content}"`;
+        utils.sendDM(client, content, message.author.id);
+    }
+
+    else
+    {
+        content = `${message.author.username} sent a message in <#${message.channelId}> saying "${message.content}"`;
+        utils.sendServerMessage(client, content);
+    }
 });
 
 // Emitted whenever a message is deleted.
 client.on('messageDelete', (message) => {
     console.log(message);
-    utils.sendMessage(client, `A message by ${message.author.username} was deleted in <#${message.channelId}>`)
+    utils.sendServerMessage(client, `A message by ${message.author.username} was deleted in <#${message.channelId}>`)
 });
 
 //todo test
@@ -279,7 +303,7 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
     function logClientStatusChange(newPresence, oldPresence, platform, oldStatus, newStatus) {
         if (oldStatus !== newStatus) {
             const content = `${newPresence.user.username} is now ${newStatus ?? 'offline'} on ${platform}${oldPresence ? ` (was ${oldStatus ?? 'offline'})` : ""}`;
-            utils.sendMessage(client, content)
+            utils.sendServerMessage(client, content)
         }
     }
     logClientStatusChange(newPresence, oldPresence, 'desktop', oldClientStatusDesktop, newClientStatusDesktop);
