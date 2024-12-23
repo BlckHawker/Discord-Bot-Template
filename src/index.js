@@ -6,6 +6,9 @@ const client = new Discord.Client({
     intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent, IntentsBitField.Flags.GuildPresences],
 })
 
+// most of the events were found by here 
+// https://gist.github.com/Iliannnn/f4985563833e2538b1b96a8cb89d72bb
+
 //todo test
 //Emitted whenever permissions for an application command in a guild were updated
 // This includes permission updates for other applications in addition to the logged in client, check "data.applicationId" to verify which application the update is for
@@ -132,7 +135,7 @@ client.on('guildMembersChunk', (members, guild, chunk) => {
 //todo test
 // Emitted whenever a guild member changes - i.e. new role, removed role, nickname.
 //todo make this more detailed to say what specifically was updated
-client.on('guildMemberUpdate', (oldMember) => {
+client.on('guildMemberUpdate', (oldMember, newMember) => {
     console.log(`guildMemberUpdate: ${oldMember} | ${newMember}`);
 });
 
@@ -261,7 +264,15 @@ client.on('messageUpdate', (oldMessage, newMessage) => {
 //todo test
 // Emitted whenever a guild member's presence (e.g. status, activity) is changed.
 client.on('presenceUpdate', (oldPresence, newPresence) => {
-    console.log(`presenceUpdate: ${oldPresence} | ${newPresence}`);
+
+    if(newPresence.userId != "330475170835726347")
+        return;
+    let oldPresenceAvailable = oldPresence !== null;
+    console.log(`oldPresence is ${oldPresenceAvailable ? "defined" : "undefined"}`)
+    const newClientStatusDesktop = newPresence.clientStatus.desktop; 
+    const newClientStatusMobile = newPresence.clientStatus.mobile; 
+    console.log(`${newPresence.user.username} is now ${newClientStatusDesktop ?? 'offline'} on desktop${oldPresenceAvailable ? ` (was ${oldPresence.clientStatus.desktop ?? 'offline'})` : ""}`);
+    console.log(`${newPresence.user.username} is now ${newClientStatusMobile ?? 'offline'} on mobile`);
 });
 
 //todo test
