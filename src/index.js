@@ -1,12 +1,13 @@
-const Discord = require('discord.js');
 require("dotenv").config();
+const Discord = require('discord.js');
+const utils = require("./utils.js");
 const { IntentsBitField } = Discord;
 
 const client = new Discord.Client({
     intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent, IntentsBitField.Flags.GuildPresences],
 })
 
-// most of the events were found by here 
+// most of the events were found here 
 // https://gist.github.com/Iliannnn/f4985563833e2538b1b96a8cb89d72bb
 
 //todo test
@@ -213,15 +214,19 @@ client.on('inviteDelete', (invite) => {
     console.log(`inviteDelete: ${invite}`);
 });
 
-//todo test
 // Emitted when a message is created
 client.on('messageCreate', (message) => {
-    console.log(`messageCreate: ${message}`);
+    if(message.author.id == process.env.CLIENT_ID)
+        return;
+    const content = `${message.author.username} sent a message in <#${message.channelId}> saying "${message.content}"`;
+    utils.sendMessage(client, content);
 });
 
 //todo test
 // Emitted whenever a message is deleted.
 client.on('messageDelete', (message) => {
+    console.log(message);
+    
     console.log(`messageDelete: ${message}`);
 });
 
@@ -261,11 +266,9 @@ client.on('messageUpdate', (oldMessage, newMessage) => {
     console.log(`messageUpdate: ${oldMessage} | ${newMessage}`);
 });
 
-//todo test
 // Emitted whenever a guild member's presence (e.g. status, activity) is changed.
 client.on('presenceUpdate', (oldPresence, newPresence) => {
-
-    if(newPresence.userId != "330475170835726347")
+    if(true)
         return;
     let oldPresenceAvailable = oldPresence !== null;
 
@@ -277,10 +280,10 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
 
     function logClientStatusChange(newPresence, oldPresence, platform, oldStatus, newStatus) {
         if (oldStatus !== newStatus) {
-            console.log(`${newPresence.user.username} is now ${newStatus ?? 'offline'} on ${platform}${oldPresence ? ` (was ${oldStatus ?? 'offline'})` : ""}`);
+            const content = `${newPresence.user.username} is now ${newStatus ?? 'offline'} on ${platform}${oldPresence ? ` (was ${oldStatus ?? 'offline'})` : ""}`;
+            utils.sendMessage(client, content)
         }
     }
-
     logClientStatusChange(newPresence, oldPresence, 'desktop', oldClientStatusDesktop, newClientStatusDesktop);
     logClientStatusChange(newPresence, oldPresence, 'mobile', oldClientStatusMobile, newClientStatusMobile);
 });
