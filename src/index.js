@@ -268,11 +268,21 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
     if(newPresence.userId != "330475170835726347")
         return;
     let oldPresenceAvailable = oldPresence !== null;
-    console.log(`oldPresence is ${oldPresenceAvailable ? "defined" : "undefined"}`)
+
+    const oldClientStatusDesktop = oldPresenceAvailable ? oldPresence.clientStatus.desktop : undefined;
+    const oldClientStatusMobile = oldPresenceAvailable ? oldPresence.clientStatus.mobile : undefined;
+
     const newClientStatusDesktop = newPresence.clientStatus.desktop; 
     const newClientStatusMobile = newPresence.clientStatus.mobile; 
-    console.log(`${newPresence.user.username} is now ${newClientStatusDesktop ?? 'offline'} on desktop${oldPresenceAvailable ? ` (was ${oldPresence.clientStatus.desktop ?? 'offline'})` : ""}`);
-    console.log(`${newPresence.user.username} is now ${newClientStatusMobile ?? 'offline'} on mobile`);
+
+    function logClientStatusChange(newPresence, oldPresence, platform, oldStatus, newStatus) {
+        if (oldStatus !== newStatus) {
+            console.log(`${newPresence.user.username} is now ${newStatus ?? 'offline'} on ${platform}${oldPresence ? ` (was ${oldStatus ?? 'offline'})` : ""}`);
+        }
+    }
+
+    logClientStatusChange(newPresence, oldPresence, 'desktop', oldClientStatusDesktop, newClientStatusDesktop);
+    logClientStatusChange(newPresence, oldPresence, 'mobile', oldClientStatusMobile, newClientStatusMobile);
 });
 
 //todo test
