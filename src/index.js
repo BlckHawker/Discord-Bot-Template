@@ -222,12 +222,10 @@ client.on('messageCreate', (message) => {
     utils.sendMessage(client, content);
 });
 
-//todo test
 // Emitted whenever a message is deleted.
 client.on('messageDelete', (message) => {
     console.log(message);
-    
-    console.log(`messageDelete: ${message}`);
+    utils.sendMessage(client, `A message by ${message.author.username} was deleted in <#${message.channelId}>`)
 });
 
 //todo test
